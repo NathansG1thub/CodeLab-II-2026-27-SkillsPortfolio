@@ -33,7 +33,174 @@ def load_students():
 
     return students
 
+def calculate_results(student):
+    """Calculate total coursework, percentage and grade."""
+    coursework_total = sum(student["coursework"])
+    total_mark = coursework_total + student["exam"]
+    percentage = (total_mark / 160) * 100
+
+    if percentage >= 70:
+        grade = "A"
+    elif percentage >= 60:
+        grade = "B"
+    elif percentage >= 50:
+        grade = "C"
+    elif percentage >= 40:
+        grade = "D"
+    else:
+        grade = "F"
+
+    return coursework_total, percentage, grade
 
 students = load_students()
 
-print(students)
+# CREATE MAIN WINDOW
+
+# COLOUR SETTINGS
+BG_COLOR = "#D0ECFA"
+BTN_COLOR = "#287C78"
+FG_COLOR = "#FBDEDE"
+TEXT_COLOR = "#263238"
+
+
+# CREATE MAIN WINDOW
+root = tk.Tk()
+root.title("Student Manager")
+root.geometry("600x550")
+root.resizable(False, False)
+root.configure(bg=BG_COLOR)
+
+
+# VIEW ALL STUDENT RECORDS
+def view_all_students():
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    title_label = tk.Label(
+        root,
+        text="All Student Records",
+        font=("Arial", 20, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    title_label.pack(pady=15)
+
+    average_percentage = sum(
+        calculate_results(student)[1] for student in students
+    ) / len(students)
+
+    summary_label = tk.Label(
+        root,
+        text=f"Number of Students: {len(students)}    "
+             f"Average Percentage: {average_percentage:.2f}%",
+        font=("Arial", 11, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    summary_label.pack(pady=10)
+
+    # RESULTS AREA
+    results_frame = tk.Frame(root, bg=BG_COLOR)
+    results_frame.pack(fill="both", expand=True, padx=15, pady=10)
+
+    scrollbar = tk.Scrollbar(results_frame)
+    scrollbar.pack(side="right", fill="y")
+
+    results_text = tk.Text(
+        results_frame,
+        font=("Consolas", 10),
+        yscrollcommand=scrollbar.set,
+        wrap="word",
+        bg="white",
+        fg=TEXT_COLOR
+    )
+    results_text.pack(side="left", fill="both", expand=True)
+
+    scrollbar.config(command=results_text.yview)
+
+    # DISPLAY EACH STUDENT
+    for student in students:
+        coursework_total, percentage, grade = calculate_results(student)
+
+        record = (
+            f"Name: {student['name']}\n"
+            f"Student Number: {student['number']}\n"
+            f"Coursework Total: {coursework_total}/60\n"
+            f"Exam Mark: {student['exam']}/100\n"
+            f"Overall Percentage: {percentage:.2f}%\n"
+            f"Grade: {grade}\n"
+            f"{'-' * 40}\n"
+        )
+
+        results_text.insert(tk.END, record)
+
+    results_text.config(state="disabled")
+
+    back_button = tk.Button(
+        root,
+        text="Back to Menu",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=show_menu
+    )
+    back_button.pack(pady=12)
+
+
+# MAIN MENU
+def show_menu():
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    title_label = tk.Label(
+        root,
+        text="Student Manager",
+        font=("Arial", 22, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    title_label.pack(pady=25)
+
+    menu_options = [
+        "View All Student Records",
+        "View Individual Student",
+        "Show Highest Scoring Student",
+        "Show Lowest Scoring Student",
+        "Sort Student Records",
+        "Add Student Record",
+        "Delete Student Record",
+        "Update Student Record"
+    ]
+
+    for index, option in enumerate(menu_options):
+        button = tk.Button(
+            root,
+            text=option,
+            font=("Arial", 11),
+            width=30,
+            bg=BTN_COLOR,
+            fg=FG_COLOR,
+            activebackground="#359A94",
+            activeforeground=FG_COLOR,
+            command=view_all_students if index == 0 else None
+        )
+        button.pack(pady=4)
+
+    quit_button = tk.Button(
+        root,
+        text="Quit",
+        font=("Arial", 11, "bold"),
+        width=30,
+        bg="#A94442",
+        fg=FG_COLOR,
+        command=root.destroy
+    )
+    quit_button.pack(pady=12)
+
+
+# DISPLAY MAIN MENU
+show_menu()
+
+# RUN APPLICATION
+root.mainloop()
