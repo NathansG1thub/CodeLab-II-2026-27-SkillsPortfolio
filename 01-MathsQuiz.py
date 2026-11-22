@@ -58,6 +58,13 @@ def displayMenu():
         command=lambda: select_difficulty("Advanced")
     ).pack(pady=5)
 
+    tk.Button(
+    root,
+    text="Quit",
+    width=15,
+    command=confirm_quit
+    ).pack(pady=10)
+
 
 def select_difficulty(difficulty):
     """Store the selected difficulty and begin the quiz."""
@@ -150,6 +157,13 @@ def displayProblem():
         command=lambda: isCorrect(answer_entry)
     )
     submit_button.pack(pady=10)
+
+    quit_button = tk.Button(
+      root,
+      text="Quit Quiz",
+      command=confirm_quit
+    )
+    quit_button.pack(pady=5)
 
     root.bind(
         "<Return>",
@@ -286,6 +300,15 @@ def displayResults():
         command=root.destroy
     ).pack(pady=5)
 
+def confirm_quit():
+    """Ask the user to confirm before quitting the quiz."""
+    answer = messagebox.askyesno(
+        "Quit Quiz",
+        "Are you sure you want to quit?"
+    )
+
+    if answer:
+        root.destroy()
 
 def start_quiz():
     """Generate ten questions and start the quiz."""
@@ -308,12 +331,12 @@ def start_quiz():
 # Main program
 root = tk.Tk()
 root.title("Maths Quiz")
-root.geometry("400x350")
+root.geometry("500x300")
 root.resizable(False, False)
 
 # Load background image
 background_image = Image.open("mathbackground.jpg")
-background_image = background_image.resize((400, 350))
+background_image = background_image.resize((500, 300))
 background_photo = ImageTk.PhotoImage(background_image)
 
 # Display background
