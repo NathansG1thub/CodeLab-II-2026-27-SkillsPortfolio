@@ -333,9 +333,10 @@ root = tk.Tk()
 root.title("Maths Quiz")
 root.geometry("500x300")
 root.resizable(False, False)
+root.iconbitmap("01-math.ico")
 
 # Load background image
-background_image = Image.open("mathbackground.jpg")
+background_image = Image.open("01-background.jpg")
 background_image = background_image.resize((500, 300))
 background_photo = ImageTk.PhotoImage(background_image)
 
