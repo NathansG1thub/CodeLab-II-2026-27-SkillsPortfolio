@@ -148,7 +148,168 @@ def view_all_students():
     back_button.pack(pady=12)
 
 
+# VIEW INDIVIDUAL STUDENT
+def view_individual_student():
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    title_label = tk.Label(
+        root,
+        text="Find Individual Student",
+        font=("Arial", 20, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    title_label.pack(pady=25)
+
+    instruction_label = tk.Label(
+        root,
+        text="Enter a student name or student number:",
+        font=("Arial", 11),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    instruction_label.pack(pady=5)
+
+    search_entry = tk.Entry(
+        root,
+        font=("Arial", 12),
+        width=30
+    )
+    search_entry.pack(pady=10)
+
+    result_label = tk.Label(
+        root,
+        text="",
+        font=("Consolas", 11),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR,
+        justify="left"
+    )
+    result_label.pack(pady=20)
+
+    def search_student():
+        search_value = search_entry.get().strip().lower()
+
+        if not search_value:
+            result_label.config(text="Please enter a name or student number.")
+            return
+
+        found_student = None
+
+        for student in students:
+            if (search_value == student["number"] or
+                    search_value == student["name"].lower()):
+                found_student = student
+                break
+
+        if found_student:
+            coursework_total, percentage, grade = calculate_results(found_student)
+
+            result = (
+                f"Name: {found_student['name']}\n\n"
+                f"Student Number: {found_student['number']}\n\n"
+                f"Coursework Total: {coursework_total}/60\n\n"
+                f"Exam Mark: {found_student['exam']}/100\n\n"
+                f"Overall Percentage: {percentage:.2f}%\n\n"
+                f"Grade: {grade}"
+            )
+
+            result_label.config(text=result)
+        else:
+            result_label.config(text="No matching student found.")
+
+    search_button = tk.Button(
+        root,
+        text="Search",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=search_student
+    )
+    search_button.pack(pady=10)
+
+    back_button = tk.Button(
+        root,
+        text="Back to Menu",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=show_menu
+    )
+    back_button.pack(pady=10)
+
 # MAIN MENU
+
+# DISPLAY HIGHEST AND LOWEST SCORING STUDENTS
+def show_top_student(highest=True):
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    if highest:
+        title = "Highest Scoring Student"
+        student = max(
+            students,
+            key=lambda student: sum(student["coursework"]) + student["exam"]
+        )
+    else:
+        title = "Lowest Scoring Student"
+        student = min(
+            students,
+            key=lambda student: sum(student["coursework"]) + student["exam"]
+        )
+
+    coursework_total, percentage, grade = calculate_results(student)
+
+    title_label = tk.Label(
+        root,
+        text=title,
+        font=("Arial", 20, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    title_label.pack(pady=25)
+
+    result = (
+        f"Name: {student['name']}\n\n"
+        f"Student Number: {student['number']}\n\n"
+        f"Coursework Total: {coursework_total}/60\n\n"
+        f"Exam Mark: {student['exam']}/100\n\n"
+        f"Overall Percentage: {percentage:.2f}%\n\n"
+        f"Grade: {grade}"
+    )
+
+    result_label = tk.Label(
+        root,
+        text=result,
+        font=("Consolas", 11),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR,
+        justify="left"
+    )
+    result_label.pack(pady=20)
+
+    back_button = tk.Button(
+        root,
+        text="Back to Menu",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=show_menu
+    )
+    back_button.pack(pady=15)
+
+
+def show_highest_student():
+    show_top_student(True)
+
+
+def show_lowest_student():
+    show_top_student(False)
+
 def show_menu():
     for widget in root.winfo_children():
         widget.destroy()
@@ -183,8 +344,13 @@ def show_menu():
             fg=FG_COLOR,
             activebackground="#359A94",
             activeforeground=FG_COLOR,
-            command=view_all_students if index == 0 else None
-        )
+            command=(
+                view_all_students if index == 0
+                else view_individual_student if index == 1
+                else show_highest_student if index == 2
+                else show_lowest_student if index == 3
+                else None
+            ))
         button.pack(pady=4)
 
     quit_button = tk.Button(
