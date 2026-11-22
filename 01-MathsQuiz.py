@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
-
+from PIL import Image, ImageTk
 
 # Global variables
 selected_difficulty = None
@@ -13,9 +13,10 @@ attempt = 1
 
 # Utility functions
 def clear_window():
-    """Remove all widgets from the main window."""
+    """Remove quiz widgets without destroying the background."""
     for widget in root.winfo_children():
-        widget.destroy()
+        if widget != background_label:
+            widget.destroy()
 
 
 # Assessment functions
@@ -309,6 +310,15 @@ root = tk.Tk()
 root.title("Maths Quiz")
 root.geometry("400x350")
 root.resizable(False, False)
+
+# Load background image
+background_image = Image.open("mathbackground.jpg")
+background_image = background_image.resize((400, 350))
+background_photo = ImageTk.PhotoImage(background_image)
+
+# Display background
+background_label = tk.Label(root, image=background_photo)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 displayMenu()
 
