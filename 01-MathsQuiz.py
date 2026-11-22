@@ -1,143 +1,315 @@
 import tkinter as tk
+from tkinter import messagebox
 import random
 
-root = tk.Tk()
-root.title("Maths Quiz")
-root.geometry("400x300")
 
+# Global variables
 selected_difficulty = None
 questions = []
 question_number = 0
 score = 0
+attempt = 1
 
 
+# Utility functions
 def clear_window():
+    """Remove all widgets from the main window."""
     for widget in root.winfo_children():
         widget.destroy()
 
 
+# Assessment functions
+def displayMenu():
+    """Display the difficulty selection menu."""
+    clear_window()
+
+    title_label = tk.Label(
+        root,
+        text="Maths Quiz",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    instruction_label = tk.Label(
+        root,
+        text="Choose a difficulty level:"
+    )
+    instruction_label.pack(pady=5)
+
+    tk.Button(
+        root,
+        text="Easy",
+        width=15,
+        command=lambda: select_difficulty("Easy")
+    ).pack(pady=5)
+
+    tk.Button(
+        root,
+        text="Moderate",
+        width=15,
+        command=lambda: select_difficulty("Moderate")
+    ).pack(pady=5)
+
+    tk.Button(
+        root,
+        text="Advanced",
+        width=15,
+        command=lambda: select_difficulty("Advanced")
+    ).pack(pady=5)
+
+
 def select_difficulty(difficulty):
+    """Store the selected difficulty and begin the quiz."""
     global selected_difficulty
+
     selected_difficulty = difficulty
+    start_quiz()
 
 
-def generate_questions(difficulty):
-    generated_questions = []
+def randomInt():
+    """
+    Generate two random integers based on the
+    selected difficulty level.
+    """
+    if selected_difficulty == "Easy":
+        minimum = 1
+        maximum = 9
 
-    for _ in range(10):
-        if difficulty == "Easy":
-            num1 = random.randint(1, 10)
-            num2 = random.randint(1, 10)
-            operation = random.choice(["+", "-"])
-        elif difficulty == "Medium":
-            num1 = random.randint(10, 50)
-            num2 = random.randint(10, 50)
-            operation = random.choice(["+", "-", "*"])
-        else:
-            num1 = random.randint(50, 100)
-            num2 = random.randint(50, 100)
-            operation = random.choice(["+", "-", "*", "/"])
+    elif selected_difficulty == "Moderate":
+        minimum = 10
+        maximum = 99
 
-        if operation == "+":
-            answer = num1 + num2
-        elif operation == "-":
-            answer = num1 - num2
-        elif operation == "*":
-            answer = num1 * num2
-        else:
-            num1 = num2 * random.randint(1, 10)
-            answer = num1 // num2
+    else:
+        minimum = 1000
+        maximum = 9999
 
-        generated_questions.append({
-            "text": f"{num1} {operation} {num2}",
-            "answer": answer
-        })
+    number1 = random.randint(minimum, maximum)
+    number2 = random.randint(minimum, maximum)
 
-    return generated_questions
+    return number1, number2
 
 
-def show_difficulty_menu():
+def decideOperation():
+    """Randomly choose either addition or subtraction."""
+    return random.choice(["+", "-"])
+
+
+def create_question():
+    """Create one random maths question and calculate its answer."""
+    number1, number2 = randomInt()
+    operation = decideOperation()
+
+    if operation == "+":
+        answer = number1 + number2
+    else:
+        answer = number1 - number2
+
+    return {
+        "text": f"{number1} {operation} {number2}",
+        "answer": answer
+    }
+
+
+def displayProblem():
+    """Display the current question and allow the user to enter an answer."""
     clear_window()
 
-    tk.Label(root, text="Choose a difficulty level", font=("Arial", 14)).pack(pady=20)
-    tk.Button(root, text="Easy", width=15,
-              command=lambda: select_difficulty("Easy")).pack(pady=5)
-    tk.Button(root, text="Medium", width=15,
-              command=lambda: select_difficulty("Medium")).pack(pady=5)
-    tk.Button(root, text="Hard", width=15,
-              command=lambda: select_difficulty("Hard")).pack(pady=5)
-    tk.Button(root, text="Start Quiz", width=15,
-              command=start_quiz).pack(pady=15)
+    question_label = tk.Label(
+        root,
+        text=f"Question {question_number + 1} of 10",
+        font=("Arial", 14, "bold")
+    )
+    question_label.pack(pady=15)
 
+    question_text = tk.Label(
+        root,
+        text=f"{questions[question_number]['text']} =",
+        font=("Arial", 18)
+    )
+    question_text.pack(pady=15)
 
-def start_quiz():
-    global questions, question_number, score
+    attempt_label = tk.Label(
+        root,
+        text=f"Attempt {attempt} of 2"
+    )
+    attempt_label.pack(pady=5)
 
-    if selected_difficulty is None:
-        tk.Label(root, text="Please select a difficulty level.", fg="red").pack()
-        return
-
-    questions = generate_questions(selected_difficulty)
-    question_number = 0
-    score = 0
-    show_question()
-
-
-def show_question():
-    clear_window()
-
-    question = questions[question_number]
-    tk.Label(root, text=f"Question {question_number + 1} of 10",
-             font=("Arial", 12)).pack(pady=10)
-    tk.Label(root, text=question["text"], font=("Arial", 18)).pack(pady=10)
-
-    answer_entry = tk.Entry(root, width=10)
+    answer_entry = tk.Entry(
+        root,
+        width=15,
+        justify="center",
+        font=("Arial", 14)
+    )
     answer_entry.pack(pady=10)
     answer_entry.focus()
 
-    tk.Button(root, text="Submit",
-              command=lambda: check_answer(answer_entry)).pack(pady=10)
+    submit_button = tk.Button(
+        root,
+        text="Submit Answer",
+        command=lambda: isCorrect(answer_entry)
+    )
+    submit_button.pack(pady=10)
+
+    root.bind(
+        "<Return>",
+        lambda event: isCorrect(answer_entry)
+    )
 
 
-def check_answer(answer_entry):
-    global question_number, score
+def isCorrect(answer_entry):
+    """
+    Check the user's answer.
+
+    A correct first attempt awards 10 points.
+    A correct second attempt awards 5 points.
+    An incorrect second attempt awards 0 points.
+    """
+    global question_number
+    global score
+    global attempt
 
     try:
         user_answer = int(answer_entry.get())
     except ValueError:
-        tk.Label(root, text="Please enter a whole number.", fg="red").pack()
+        messagebox.showerror(
+            "Invalid Answer",
+            "Please enter a whole number."
+        )
         return
 
-    if user_answer == questions[question_number]["answer"]:
-        score += 1
+    correct_answer = questions[question_number]["answer"]
+
+    if user_answer == correct_answer:
+
+        if attempt == 1:
+            score += 10
+            messagebox.showinfo(
+                "Correct",
+                "Correct! You earned 10 points."
+            )
+        else:
+            score += 5
+            messagebox.showinfo(
+                "Correct",
+                "Correct on your second attempt! You earned 5 points."
+            )
+
+        move_to_next_question()
+
+    else:
+
+        if attempt == 1:
+            attempt = 2
+
+            messagebox.showwarning(
+                "Incorrect",
+                "That answer is incorrect.\n\n"
+                "You have one more attempt."
+            )
+
+            displayProblem()
+
+        else:
+            messagebox.showerror(
+                "Incorrect",
+                f"Incorrect again.\n\n"
+                f"The correct answer was {correct_answer}."
+            )
+
+            move_to_next_question()
+
+
+def move_to_next_question():
+    """Move to the next question or display the final results."""
+    global question_number
+    global attempt
 
     question_number += 1
+    attempt = 1
+
     if question_number < 10:
-        show_question()
+        displayProblem()
     else:
-        show_result()
+        displayResults()
 
 
-def show_result():
+def displayResults():
+    """Display the final score and performance ranking."""
     clear_window()
 
-    tk.Label(root, text="Quiz Complete", font=("Arial", 16)).pack(pady=20)
-    tk.Label(root, text=f"Your score: {score} out of 10",
-             font=("Arial", 14)).pack(pady=10)
-
-    if score == 10:
-        message = "Excellent!"
-    elif score >= 7:
-        message = "Good job!"
-    elif score >= 4:
-        message = "Not bad!"
+    if score > 90:
+        rank = "A+"
+    elif score >= 80:
+        rank = "A"
+    elif score >= 70:
+        rank = "B"
+    elif score >= 60:
+        rank = "C"
+    elif score >= 50:
+        rank = "D"
     else:
-        message = "Keep practising!"
+        rank = "F"
 
-    tk.Label(root, text=message).pack(pady=10)
-    tk.Button(root, text="Play Again",
-              command=show_difficulty_menu).pack(pady=10)
+    result_label = tk.Label(
+        root,
+        text="Quiz Complete!",
+        font=("Arial", 20, "bold")
+    )
+    result_label.pack(pady=20)
+
+    score_label = tk.Label(
+        root,
+        text=f"Your score: {score} out of 100",
+        font=("Arial", 16)
+    )
+    score_label.pack(pady=10)
+
+    rank_label = tk.Label(
+        root,
+        text=f"Rank: {rank}",
+        font=("Arial", 16, "bold")
+    )
+    rank_label.pack(pady=10)
+
+    tk.Button(
+        root,
+        text="Play Again",
+        width=15,
+        command=displayMenu
+    ).pack(pady=10)
+
+    tk.Button(
+        root,
+        text="Quit",
+        width=15,
+        command=root.destroy
+    ).pack(pady=5)
 
 
-show_difficulty_menu()
+def start_quiz():
+    """Generate ten questions and start the quiz."""
+    global questions
+    global question_number
+    global score
+    global attempt
+
+    questions = []
+    question_number = 0
+    score = 0
+    attempt = 1
+
+    for _ in range(10):
+        questions.append(create_question())
+
+    displayProblem()
+
+
+# Main program
+root = tk.Tk()
+root.title("Maths Quiz")
+root.geometry("400x350")
+root.resizable(False, False)
+
+displayMenu()
+
 root.mainloop()
