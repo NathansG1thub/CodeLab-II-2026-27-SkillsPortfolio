@@ -172,38 +172,45 @@ punchline_label = tk.Label(
 )
 punchline_label.pack(pady=10)
 
+
+button_frame = tk.Frame(joke_frame)
+button_frame.pack(pady=15)
+
 show_punchline_button = tk.Button(
-    joke_frame,
+    button_frame,
     text="Show Punchline",
     font=("Arial", 11),
+    width=16,
     command=show_punchline
 )
-show_punchline_button.pack(pady=5)
+show_punchline_button.grid(row=0, column=0, padx=5, pady=5)
 
 next_button = tk.Button(
-    joke_frame,
+    button_frame,
     text="Next Joke",
     font=("Arial", 11),
+    width=16,
     command=next_joke
 )
-next_button.pack(pady=5)
+next_button.grid(row=0, column=1, padx=5, pady=5)
 
 previous_button = tk.Button(
-    joke_frame,
+    button_frame,
     text="Previous Joke",
     font=("Arial", 11),
+    width=16,
     command=previous_joke
 )
-previous_button.pack(pady=5)
+previous_button.grid(row=1, column=0, padx=5, pady=5)
 
 quit_button = tk.Button(
-    joke_frame,
+    button_frame,
     text="Quit",
     font=("Arial", 11),
+    width=16,
     command=show_menu
 )
-quit_button.pack(pady=5)
-
+quit_button.grid(row=1, column=1, padx=5, pady=5)
 
 # Display the welcome page initially
 show_menu()
