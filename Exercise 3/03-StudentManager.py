@@ -310,6 +310,175 @@ def show_highest_student():
 def show_lowest_student():
     show_top_student(False)
 
+
+# SORT STUDENT RECORDS
+def sort_students():
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    title_label = tk.Label(
+        root,
+        text="Sort Student Records",
+        font=("Arial", 20, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    )
+    title_label.pack(pady=15)
+
+    tk.Label(
+        root,
+        text="Choose a sorting method:",
+        font=("Arial", 11),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    ).pack(pady=5)
+
+    sort_options = [
+        "Student Name",
+        "Student Number",
+        "Overall Percentage"
+    ]
+
+    sort_choice = tk.StringVar(value="Student Name")
+
+    for option in sort_options:
+        tk.Radiobutton(
+            root,
+            text=option,
+            variable=sort_choice,
+            value=option,
+            font=("Arial", 11),
+            bg=BG_COLOR,
+            fg=TEXT_COLOR,
+            selectcolor=BG_COLOR
+        ).pack(anchor="w", padx=170)
+
+    order_choice = tk.StringVar(value="Ascending")
+
+    tk.Label(
+        root,
+        text="Choose sorting order:",
+        font=("Arial", 11),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    ).pack(pady=8)
+
+    for option in ["Ascending", "Descending"]:
+        tk.Radiobutton(
+            root,
+            text=option,
+            variable=order_choice,
+            value=option,
+            font=("Arial", 11),
+            bg=BG_COLOR,
+            fg=TEXT_COLOR,
+            selectcolor=BG_COLOR
+        ).pack(anchor="w", padx=170)
+
+    def display_sorted_records():
+        selected = sort_choice.get()
+        descending = order_choice.get() == "Descending"
+
+        if selected == "Student Name":
+            sorted_students = sorted(
+                students,
+                key=lambda student: student["name"].lower(),
+                reverse=descending
+            )
+        elif selected == "Student Number":
+            sorted_students = sorted(
+                students,
+                key=lambda student: int(student["number"]),
+                reverse=descending
+            )
+        else:
+            sorted_students = sorted(
+                students,
+                key=lambda student: sum(student["coursework"]) + student["exam"],
+                reverse=descending
+            )
+
+        # DISPLAY SORTED RESULTS
+        for widget in root.winfo_children():
+            widget.destroy()
+
+        title_label = tk.Label(
+            root,
+            text=f"Sorted by {selected} ({order_choice.get()})",
+            font=("Arial", 18, "bold"),
+            bg=BG_COLOR,
+            fg=TEXT_COLOR
+        )
+        title_label.pack(pady=15)
+
+        results_frame = tk.Frame(root, bg=BG_COLOR)
+        results_frame.pack(fill="both", expand=True, padx=15, pady=5)
+
+        scrollbar = tk.Scrollbar(results_frame)
+        scrollbar.pack(side="right", fill="y")
+
+        results_text = tk.Text(
+            results_frame,
+            font=("Consolas", 10),
+            yscrollcommand=scrollbar.set,
+            wrap="word",
+            bg="white",
+            fg=TEXT_COLOR
+        )
+        results_text.pack(side="left", fill="both", expand=True)
+
+        scrollbar.config(command=results_text.yview)
+
+        for student in sorted_students:
+            coursework_total, percentage, grade = calculate_results(student)
+
+            record = (
+                f"Name: {student['name']}\n"
+                f"Student Number: {student['number']}\n"
+                f"Coursework Total: {coursework_total}/60\n"
+                f"Exam Mark: {student['exam']}/100\n"
+                f"Overall Percentage: {percentage:.2f}%\n"
+                f"Grade: {grade}\n"
+                f"{'-' * 40}\n"
+            )
+
+            results_text.insert(tk.END, record)
+
+        results_text.config(state="disabled")
+
+        back_button = tk.Button(
+            root,
+            text="Back to Menu",
+            font=("Arial", 11),
+            width=20,
+            bg=BTN_COLOR,
+            fg=FG_COLOR,
+            command=show_menu
+        )
+        back_button.pack(pady=10)
+
+    sort_button = tk.Button(
+        root,
+        text="Sort Records",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=display_sorted_records
+    )
+    sort_button.pack(pady=12)
+
+    back_button = tk.Button(
+        root,
+        text="Back to Menu",
+        font=("Arial", 11),
+        width=20,
+        bg=BTN_COLOR,
+        fg=FG_COLOR,
+        command=show_menu
+    )
+    back_button.pack(pady=5)
+
 def show_menu():
     for widget in root.winfo_children():
         widget.destroy()
@@ -349,6 +518,7 @@ def show_menu():
                 else view_individual_student if index == 1
                 else show_highest_student if index == 2
                 else show_lowest_student if index == 3
+                else sort_students if index == 4
                 else None
             ))
         button.pack(pady=4)
