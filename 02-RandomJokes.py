@@ -1,6 +1,7 @@
 
 import tkinter as tk
 import random
+from PIL import Image, ImageTk
 
 current_joke = None
 joke_history = []
@@ -119,9 +120,16 @@ root.title("Random Jokes")
 root.geometry("500x350")
 root.resizable(False, False)
 
+# Load background image
+background_image = Image.open("02-joke_background.jpg")
+background_image = background_image.resize((500, 350))
+background_photo = ImageTk.PhotoImage(background_image)
+
+background_label = tk.Label(root, image=background_photo)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
 # Page 1: Welcome screen
-menu_frame = tk.Frame(root)
+menu_frame = tk.Frame(root, bg="")
 
 heading_label = tk.Label(
     menu_frame,
