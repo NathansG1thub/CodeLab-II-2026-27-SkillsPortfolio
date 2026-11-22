@@ -3,7 +3,7 @@ import random
 import os  # Added for file paths
 from PIL import Image, ImageTk
 
-# GET THE SCRIPT'S FOLDER PATH
+# Get the directory of the current script to construct file paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 current_joke = None
@@ -15,7 +15,7 @@ def load_jokes():
     """Read jokes from the external text file."""
     jokes = []
     
-    # UPDATED FILE PATH
+    # Updated file path to ensure it works regardless of the current working directory
     file_path = os.path.join(script_dir, "02-randomJokes.txt")
 
     try:
@@ -126,7 +126,7 @@ root.title("Random Jokes")
 root.geometry("500x350")
 root.resizable(False, False)
 
-# SET ICON WITH DYNAMIC PATH 
+# Set the application icon (ensure the path is correct)
 icon_path = os.path.join(script_dir, "02-clown.ico")
 try:
     root.iconbitmap(icon_path)
@@ -141,7 +141,7 @@ FG_COLOR = "white"
 # Page 1: Welcome screen
 menu_frame = tk.Frame(root)
 
-# UPDATED IMAGE PATH
+# Updated image path to ensure it works regardless of the current working directory
 menu_bg_path = os.path.join(script_dir, "02-joke_background.jpg")
 menu_background_image = Image.open(menu_bg_path)
 menu_background_image = menu_background_image.resize((500, 350))
@@ -187,7 +187,7 @@ tell_joke_button.pack(pady=20)
 # Page 2: Joke screen
 joke_frame = tk.Frame(root)
 
-# UPDATED IMAGE PATH
+# Updated image path to ensure it works regardless of the current working directory
 joke_bg_path = os.path.join(script_dir, "02-joke_background.jpg")
 joke_background_image = Image.open(joke_bg_path)
 joke_background_image = joke_background_image.resize((500, 350))

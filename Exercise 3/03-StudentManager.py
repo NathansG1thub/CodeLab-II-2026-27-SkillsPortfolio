@@ -72,30 +72,30 @@ def calculate_results(student):
 
 students = load_students()
 
-# CREATE MAIN WINDOW
+# Create main window and set its properties
 
-# COLOUR SETTINGS
+# Color scheme
 BG_COLOR = "#D0ECFA"
 BTN_COLOR = "#287C78"
 FG_COLOR = "#FBDEDE"
 TEXT_COLOR = "#263238"
 
 
-# CREATE MAIN WINDOW
+# Create the main application window
 root = tk.Tk()
 root.title("Student Manager")
 root.geometry("600x550")
 root.resizable(False, False)
 root.configure(bg=BG_COLOR)
 
-# SET ICON WITH DYNAMIC PATH
+# Set the application icon
 icon_path = os.path.join(script_dir, "03-student_cap.ico")
 try:
     root.iconbitmap(icon_path)
 except tk.TclError:
     print(f"Warning: Could not load icon at {icon_path}. Using default icon.")
 
-# VIEW ALL STUDENT RECORDS
+# View All Students
 def view_all_students():
     for widget in root.winfo_children():
         widget.destroy()
@@ -123,7 +123,7 @@ def view_all_students():
     )
     summary_label.pack(pady=10)
 
-    # RESULTS AREA
+    # Results Frame with Scrollbar
     results_frame = tk.Frame(root, bg=BG_COLOR)
     results_frame.pack(fill="both", expand=True, padx=15, pady=10)
 
@@ -142,7 +142,7 @@ def view_all_students():
 
     scrollbar.config(command=results_text.yview)
 
-    # DISPLAY EACH STUDENT
+    # Display each student's record
     for student in students:
         coursework_total, percentage, grade = calculate_results(student)
 
@@ -172,7 +172,7 @@ def view_all_students():
     back_button.pack(pady=12)
 
 
-# VIEW INDIVIDUAL STUDENT
+# View Individual Student
 def view_individual_student():
     for widget in root.winfo_children():
         widget.destroy()
@@ -265,9 +265,9 @@ def view_individual_student():
     )
     back_button.pack(pady=10)
 
-# MAIN MENU
+# Main Menu
 
-# DISPLAY HIGHEST AND LOWEST SCORING STUDENTS
+# Display Highest and Lowest Scoring Students
 def show_top_student(highest=True):
     for widget in root.winfo_children():
         widget.destroy()
@@ -335,7 +335,7 @@ def show_lowest_student():
     show_top_student(False)
 
 
-# SORT STUDENT RECORDS
+# Sort Student Records
 def sort_students():
     for widget in root.winfo_children():
         widget.destroy()
@@ -422,7 +422,7 @@ def sort_students():
                 reverse=descending
             )
 
-        # DISPLAY SORTED RESULTS
+        # Display the sorted records
         for widget in root.winfo_children():
             widget.destroy()
 
@@ -503,7 +503,7 @@ def sort_students():
     )
     back_button.pack(pady=5)
 
-# ADD STUDENT RECORD
+# Add Student Record
 def add_student():
     for widget in root.winfo_children():
         widget.destroy()
@@ -636,7 +636,7 @@ def add_student():
     )
     back_button.pack(pady=5)
 
-# DELETE STUDENT RECORD
+# Delete Student Record
 def delete_student():
     for widget in root.winfo_children():
         widget.destroy()
@@ -717,7 +717,7 @@ def delete_student():
     )
     back_button.pack(pady=5)
 
-# UPDATE STUDENT RECORD
+# Update Student Record
 def update_student():
     for widget in root.winfo_children():
         widget.destroy()
@@ -759,7 +759,7 @@ def update_student():
             )
             return
 
-        # DISPLAY EDITING FORM
+        # Display the update form with current values
         for widget in root.winfo_children():
             widget.destroy()
 
@@ -979,8 +979,8 @@ def show_menu():
     quit_button.pack(pady=12)
 
 
-# DISPLAY MAIN MENU
+# Display the main menu when the application starts
 show_menu()
 
-# RUN APPLICATION
+# Run the main event loop to keep the application running
 root.mainloop()
