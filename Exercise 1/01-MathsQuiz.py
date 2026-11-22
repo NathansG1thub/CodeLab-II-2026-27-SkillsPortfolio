@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
+import os
 from PIL import Image, ImageTk
 
 # Global variables
@@ -333,10 +334,18 @@ root = tk.Tk()
 root.title("Maths Quiz")
 root.geometry("500x300")
 root.resizable(False, False)
-root.iconbitmap("01-math.ico")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+icon_path = os.path.join(script_dir, "01-math.ico")
+bg_path = os.path.join(script_dir, "01-background.jpg")
+
+# for icon and background image, handle exceptions if files are missing
+try:
+    root.iconbitmap(icon_path)
+except tk.TclError:
+    print(f"Could not load icon at: {icon_path}")
 
 # Load background image
-background_image = Image.open("01-background.jpg")
+background_image = Image.open(bg_path)
 background_image = background_image.resize((500, 300))
 background_photo = ImageTk.PhotoImage(background_image)
 

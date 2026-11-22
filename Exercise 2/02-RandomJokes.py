@@ -1,17 +1,25 @@
 import tkinter as tk
 import random
+import os  # Added for file paths
 from PIL import Image, ImageTk
+
+# GET THE SCRIPT'S FOLDER PATH
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 current_joke = None
 joke_history = []
 history_position = -1
 
+
 def load_jokes():
     """Read jokes from the external text file."""
     jokes = []
+    
+    # UPDATED FILE PATH
+    file_path = os.path.join(script_dir, "02-randomJokes.txt")
 
     try:
-        with open("02-randomJokes.txt", "r", encoding="utf-8") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line in file:
                 line = line.strip()
 
@@ -20,7 +28,7 @@ def load_jokes():
                     jokes.append((setup + "?", punchline))
 
     except FileNotFoundError:
-        print("Error: 02-randomJokes.txt could not be found.")
+        print(f"Error: {file_path} could not be found.")
 
     return jokes
 
@@ -117,17 +125,25 @@ root = tk.Tk()
 root.title("Random Jokes")
 root.geometry("500x350")
 root.resizable(False, False)
-root.iconbitmap("02-clown.ico")
+
+# SET ICON WITH DYNAMIC PATH 
+icon_path = os.path.join(script_dir, "02-clown.ico")
+try:
+    root.iconbitmap(icon_path)
+except tk.TclError:
+    print(f"Warning: Could not load icon at {icon_path}. Using default icon.")
 
 # Colors to match the background image
-BG_COLOR = "#1b0a5e"  # Dark blue from the background
-BTN_COLOR = "#5B4B8A" # Purple from your button frame
-FG_COLOR = "white"    # Text color
+BG_COLOR = "#1b0a5e"  
+BTN_COLOR = "#5B4B8A" 
+FG_COLOR = "white"    
 
 # Page 1: Welcome screen
 menu_frame = tk.Frame(root)
 
-menu_background_image = Image.open("02-joke_background.jpg")
+# UPDATED IMAGE PATH
+menu_bg_path = os.path.join(script_dir, "02-joke_background.jpg")
+menu_background_image = Image.open(menu_bg_path)
 menu_background_image = menu_background_image.resize((500, 350))
 menu_background_photo = ImageTk.PhotoImage(menu_background_image)
 
@@ -137,7 +153,6 @@ menu_background_label = tk.Label(
 )
 menu_background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-# FIX: Added bg and fg
 heading_label = tk.Label(
     menu_frame,
     text="Random Jokes",
@@ -147,7 +162,6 @@ heading_label = tk.Label(
 )
 heading_label.pack(pady=50)
 
-# FIX: Added bg and fg
 welcome_label = tk.Label(
     menu_frame,
     text="Ready for a laugh?",
@@ -157,7 +171,6 @@ welcome_label = tk.Label(
 )
 welcome_label.pack(pady=10)
 
-# FIX: Styled the button
 tell_joke_button = tk.Button(
     menu_frame,
     text="Tell Me a Joke",
@@ -174,7 +187,9 @@ tell_joke_button.pack(pady=20)
 # Page 2: Joke screen
 joke_frame = tk.Frame(root)
 
-joke_background_image = Image.open("02-joke_background.jpg")
+# UPDATED IMAGE PATH
+joke_bg_path = os.path.join(script_dir, "02-joke_background.jpg")
+joke_background_image = Image.open(joke_bg_path)
 joke_background_image = joke_background_image.resize((500, 350))
 joke_background_photo = ImageTk.PhotoImage(joke_background_image)
 
@@ -184,7 +199,6 @@ joke_background_label = tk.Label(
 )
 joke_background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-# FIX: Added bg and fg
 joke_heading = tk.Label(
     joke_frame,
     text="Random Jokes",
@@ -194,7 +208,6 @@ joke_heading = tk.Label(
 )
 joke_heading.pack(pady=20)
 
-# FIX: Added bg and fg
 setup_label = tk.Label(
     joke_frame,
     text="",
@@ -205,7 +218,6 @@ setup_label = tk.Label(
 )
 setup_label.pack(pady=15)
 
-# FIX: Added bg and fg
 punchline_label = tk.Label(
     joke_frame,
     text="",
@@ -217,11 +229,9 @@ punchline_label = tk.Label(
 punchline_label.pack(pady=10)
 
 
-# FIX: Matched the frame background to the button color
 button_frame = tk.Frame(joke_frame, bg=BTN_COLOR)
 button_frame.pack(pady=15)
 
-# FIX: Styled all buttons to match
 show_punchline_button = tk.Button(
     button_frame,
     text="Show Punchline",
